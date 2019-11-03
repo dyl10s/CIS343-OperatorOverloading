@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/strohscd/Projects/Operator Overloading/Fraction.cpp
+Fraction.h
+/home/strohscd/Projects/Operator Overloading/Fraction.h
+algorithm
+-
+iomanip
+-
+regex
+-
+
+/home/strohscd/Projects/Operator Overloading/Fraction.h
+iostream
+-
+optional
+-
+string
+-
+
