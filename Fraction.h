@@ -36,6 +36,9 @@ class Fraction {
     Fraction toReduced() const;
     bool isReduced() const;
     bool isProper() const;
+    void setDenominator(int);
+    void setNumerator(int);
+    void setWhole(int);
 
     // Operator functions
     Fraction &operator=(const Fraction &);      // Copy assignment

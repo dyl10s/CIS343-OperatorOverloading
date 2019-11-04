@@ -25,44 +25,43 @@ Fraction::Fraction(int v) {
     denominatorValue = 1;
 }
 
-Fraction::Fraction(const Fraction &other) {}
+Fraction::Fraction(const Fraction &other) {
+    hasWhole = other.hasWhole;
+    hasFraction = other.hasFraction;
+    isPositiveNum = other.isPositiveNum;
+    wholeValue = other.wholeValue;
+    numeratorValue = other.numeratorValue;
+    denominatorValue = other.denominatorValue;
+}
 
-Fraction::Fraction(Fraction &&other) {}
+Fraction::Fraction(Fraction &&other) {
+
+}
 
 Fraction::Fraction(std::string s) {
-    std::string current = "";
-
-    for(auto x : s){
-        if(x == ' '){
-            hasWhole = true;
-            if(stoi(current) > 0){
-                isPositiveNum = true;
-            }
-            wholeValue = abs(stoi(current));
-            current = "";
-        }else if(x == '/'){
-            hasFraction = true;
-            if(stoi(current) <= 0){
-                isPositiveNum = false;
-            }
-            numeratorValue = abs(stoi(current));
-            current = "";
-        }else{
-            current += x;
-        }
+    if(s.find('-') != std::string::npos){
+        isPositiveNum = false;
+    }else{
+        isPositiveNum = true;
     }
 
-    if(hasFraction == false){
-        if(stoi(current) > 0){
-            isPositiveNum = true;
-        }
-        wholeValue = abs(stoi(current));
-    }else{
+    if(s.find('/') == std::string::npos){
         hasWhole = true;
-        denominatorValue = stoi(current);
-        if(denominatorValue == 0){
-            throw std::invalid_argument("Negative Denominator");
-        }
+        wholeValue = abs(stoi(s));
+    }else if(s.find(' ') != std::string::npos){
+        hasWhole = true;
+        hasFraction = true;
+        wholeValue = abs(stoi(s.substr(0, s.find(' '))));
+        numeratorValue = abs(stoi(s.substr(s.find(' '), s.find('/') - s.find(' '))));
+        denominatorValue = abs(stoi(s.substr(s.find('/') + 1, s.length() - (s.find('/') + 1))));
+    }else{
+        hasFraction = true;
+        numeratorValue = abs(stoi(s.substr(0, s.find('/'))));
+        denominatorValue = abs(stoi(s.substr(s.find('/') + 1, s.length() - (s.find('/') + 1))));
+    }
+
+    if(denominatorValue == 0){
+        throw std::invalid_argument("Zero in Denominator");
     }
 }
 
@@ -86,12 +85,31 @@ bool Fraction::isPositive() const {
     return isPositiveNum;
 }
 
-Fraction& Fraction::operator=(const Fraction &other) { return *this; }
+Fraction& Fraction::operator=(const Fraction &other) { 
+    hasWhole = other.hasWhole;
+    hasFraction = other.hasFraction;
+    isPositiveNum = other.isPositiveNum;
+    wholeValue = other.wholeValue;
+    numeratorValue = other.numeratorValue;
+    denominatorValue = other.denominatorValue;
+    return *this;
+}
 
-Fraction& Fraction::operator=(Fraction &&other) { return *this; }
+Fraction& Fraction::operator=(Fraction &&other) { 
+    hasWhole = other.hasWhole;
+    hasFraction = other.hasFraction;
+    isPositiveNum = other.isPositiveNum;
+    wholeValue = other.wholeValue;
+    numeratorValue = other.numeratorValue;
+    denominatorValue = other.denominatorValue;
+    return *this;
+}
 
 Fraction Fraction::operator+(int num) const { 
- }
+    Fraction f{*this};
+    f.setWhole(f.whole() + num);
+    return f;
+}
 
 Fraction Fraction::operator+(const Fraction &other) const { return {}; }
 
@@ -111,9 +129,25 @@ bool Fraction::operator<(const Fraction &other) const { return {}; }
 
 bool Fraction::operator==(const Fraction &other) const { return {}; }
 
-void Fraction::makeProper() {}
+void Fraction::makeProper() {
+    int wholeChunks = numeratorValue / denominatorValue;
+    numeratorValue -= wholeChunks * denominatorValue;
+    if(numeratorValue == 0){
+        hasFraction = false;
+        denominatorValue = 1;
+    }
+    wholeValue += wholeChunks;
+}
 
-Fraction Fraction::toProper() const { return {}; }
+Fraction Fraction::toProper() const { 
+    Fraction f{*this};
+
+    int wholeChunks = numeratorValue / denominatorValue;
+    f.setNumerator(f.numerator() - wholeChunks * denominatorValue);
+    f.setWhole(f.whole() + wholeChunks);
+
+    return f;
+}
 
 void Fraction::reduce() {}
 
@@ -127,11 +161,36 @@ istream &Fraction::readFrom(istream &sr) /*throw(std::invalid_argument) */ {
 
 bool Fraction::isReduced() const { return {}; }
 
-bool Fraction::isProper() const { return {}; }
+bool Fraction::isProper() const { 
+    if(hasFraction){
+        if(numeratorValue >= denominatorValue){
+            return false;
+        }else{
+            return true;
+        }
+    }
+    return false;
+}
 
 ostream &operator<<(ostream &os, const Fraction &f) { return os; }
 
 istream &operator>>(istream &s, Fraction &f) { return s; }
+
+void Fraction::setNumerator(int v){
+    if(v == 0){
+        hasFraction = false;
+        denominatorValue = 0;
+    }
+    numeratorValue = v;
+}
+
+void Fraction::setDenominator(int v){
+    denominatorValue = v;
+}
+
+void Fraction::setWhole(int v){
+    wholeValue = v;
+}
 
 #if I_DO_EXTRA_CREDIT
 optional<string> Fraction::isRepeating() const { return {}; }
